@@ -1,0 +1,57 @@
+name: day 1 exercise actions
+env:
+  DEPLOY_ENV: Deploying
+  
+on: 
+  push: 
+    branches: [main]
+    paths-ignore:
+      - '.github/**'
+  workflow_dispatch:     
+
+jobs:
+  build:
+    runs-on: ubuntu-slim
+    steps:
+      - name: Build project
+        run: |
+          mkdir -p package
+          ls > package/file_list.txt
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: package/   
+        
+  test:
+    runs-on: ubuntu-slim
+    needs: build
+    steps:
+      - name: Print stage variable
+        run: echo 'Stage $STAGE'
+        env:
+          STAGE: test
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: production
+    runs-on: ubuntu-slim
+    needs: test
+    steps:
+      - name: Print enviroment variable
+        run: echo "$DEPLOY_ENV"
+
+      - name: Download artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: build-output
+          path: dist
+          
+      - name: Look at the list
+        run: |
+          ls -l dist
+          cat dist/file_list.txt
+    
+  
+
