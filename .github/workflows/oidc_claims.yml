@@ -20,6 +20,7 @@ jobs:
           # "id-token: write" above. We use them to ask GitHub for a token whose audience is AWS.
           TOKEN=$(curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | python3 -c "import sys, json; print(json.load(sys.stdin)['value'])")
           export TOKEN
+          echo "::add-mask::$TOKEN"
           python3 - <<'PY'
           import base64, json, os
           # The token has three parts separated by dots. The middle part holds the claims, as JSON.
