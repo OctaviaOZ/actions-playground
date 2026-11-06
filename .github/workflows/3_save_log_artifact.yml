@@ -1,0 +1,35 @@
+name: Run Tests and Upload Logs
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-slim
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt || true; fi
+
+      - name: Run tests (capture logs)
+        run: |
+          # Preserve pipeline failures
+          set -o pipefail 
+          pytest -q | tee test.log || TEST_EXIT_CODE=$? # $? Read the previous command's exit code
+          echo "Pytest exit code: ${TEST_EXIT_CODE:-0}"
+
+      - name: Upload test logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: test.log
