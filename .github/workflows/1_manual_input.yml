@@ -10,7 +10,7 @@ on:
 
 jobs:
   hello:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Say hello
         run: echo "Hello, ${{ github.event.inputs.name }}!"
