@@ -3,13 +3,14 @@ name: Use Composite Action
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   call-composite:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout (not required by this action but common)
+      - name: Checkout (optional)
         uses: actions/checkout@v5
 
       - name: Run composite action
-        uses: ./.github/actions/say-hello
+        uses: ./.github/workflows/04_composite_action/
